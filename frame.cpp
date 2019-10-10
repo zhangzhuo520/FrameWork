@@ -10,6 +10,7 @@ Frame::Frame(QWidget *parent) :
     QDialog(parent)
 {
     initUi();
+    initSysIcon();
     initStyle();
 }
 
@@ -61,9 +62,9 @@ void Frame::initUi()
 void Frame::initStyle()
 {
     this->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint);
+    this->setSizeGripEnabled(true);
 #ifndef AROUND_STRETCH_FLAG
     this->setProperty("CanMove", true);
-    this->setSizeGripEnabled(true);
 #else
     m_framelessHelper = new tools::FramelessHelper(this);
     m_framelessHelper->activateOn(this);
@@ -85,12 +86,23 @@ void Frame::initStyle()
     QIcon title_icon(":/pic/picture/serial.png");
     QPixmap pixmap = title_icon.pixmap(QSize(16, 16));
     m_icon_label->setPixmap(pixmap);
+   setWindowIcon(title_icon);
 
     tools::Helper::moveFormToCenter(this);
 
     connect(m_close_button, SIGNAL(clicked()), this, SLOT(close()));
     connect(m_min_button, SIGNAL(clicked()), this, SLOT(showMinimized()));
     connect(m_max_button, SIGNAL(clicked()), this, SLOT(slot_max_clicked()));
+    connect(m_min_button, SIGNAL(clicked()), m_systrayIcon, SLOT(show()));
+    connect(m_systrayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(slot_systrayIcon_active(QSystemTrayIcon::ActivationReason)));
+}
+
+void Frame::initSysIcon()
+{
+    m_systrayIcon = new QSystemTrayIcon(this);
+    QIcon icon = QIcon(":/pic/picture/serial.png");
+    m_systrayIcon->setIcon(icon);
+    m_systrayIcon->setToolTip("Frame");
 }
 
 bool Frame::eventFilter(QObject *obj, QEvent *event)
@@ -119,6 +131,12 @@ void Frame::slot_max_clicked()
         this->setProperty("CanMove", true);
 #endif
     }
+}
+
+void Frame::slot_systrayIcon_active(QSystemTrayIcon::ActivationReason reson)
+{
+    if(reson == QSystemTrayIcon::Trigger)
+        this->showNormal();
 }
 
 

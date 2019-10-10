@@ -1,7 +1,8 @@
 #ifndef FRAME_H
 #define FRAME_H
 #include <QDialog>
-//#define AROUND_STRETCH_FLAG
+#include <qsystemtrayicon.h>
+#define AROUND_STRETCH_FLAG
 
 class QLabel;
 class QPushButton;
@@ -20,11 +21,13 @@ protected:
 
 private slots:
     void slot_max_clicked();
-
+    void slot_systrayIcon_active(QSystemTrayIcon::ActivationReason);
 private:
     void initUi();
     void initStyle();
+    void initSysIcon();
 
+    QSystemTrayIcon *m_systrayIcon;
     QWidget *m_title_widget;
     QLabel *m_icon_label;
     QLabel *m_title_label;
